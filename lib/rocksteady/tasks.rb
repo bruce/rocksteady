@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'rake'
+
 namespace :rocksteady do
   
   desc "Remove build files"
@@ -15,19 +18,16 @@ namespace :rocksteady do
   
   namespace :refs do
     
-    task :check => :find do
-      @rocksteady.refs.each do |repo_name, ref|
-        repo = @rocksteady.repos[repo_name]
-        unless repo.log(ref).any?
-          abort "Could not find #{repo_name} ref `#{ref}'"
-        end
+    task :check => :default do
+      begin
+        @rocksteady.verify_refs!
+      rescue ArgumentError => e
+        abort e.message
       end
     end
     
-    task :find => :add_from_env do
-      @rocksteady.repos.each_key do |repo_name|
-        @rocksteady.refs[repo_name] ||= 'master'
-      end
+    task :default => :add_from_env do
+      @rocksteady.default_refs!
     end
     
     task :add_from_env => 'rocksteady:repos:check' do
@@ -77,3 +77,7 @@ task :rocksteady => 'rocksteady:run' do
     Rake::Task[t].invoke
   end
 end
+
+
+include RockSteady::Helpers
+@rocksteady = RockSteady.new
