@@ -82,7 +82,7 @@ Run all scenarios, with all repos set to <tt>master</tt>:
 
   $ rake rocksteady
   
-Run just the first scenario (you can use @rake -T@ to see them all), with all repos set to <tt>master</tt>:
+Run just the first scenario (you can use <tt>rake -T</tt> to see them all), with all repos set to <tt>master</tt>:
 
   $ rake rocksteady:scenario:1
   
