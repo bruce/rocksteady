@@ -1,19 +1,13 @@
 = Rocksteady
 
-This rake-based library lets you run defined scenarios across multiple git repositories at arbitrary HEADs.  It's meant primarily as an easy way to test compatibility.
+Often you need to test bits of code you write with bits of code other people write, across varying revisions.  This is tedious, requiring a lot of custom work and infrastructure, so you probably don't do it enough.  I know I don't, and it's a bad habit.
 
-== Author
+Rocksteady is meant to ease the process of switching out different versions of inter-dependent code, providing you with a simple _scenario_ metaphor to write build and test code within.  It's test framework agnostic (it just uses exit codes), and extremely flexible.  _Below you can read an example of testing different versions of Rails against a different versions of a plugin._
 
 Bruce Williams (http://codefluency.com)
 http://github.com/bruce
 
 Please let me know if you're using Rocksteady; I enjoy hearing how my software is being used.
-
-== Premise
-
-Often you need to test bits of code you write with bits of code other people write, across varying revisions.  This is tedious, requiring a lot of custom code and infrastructure, so you probably don't do it enough.  I know I don't, and it's a bad habit.
-
-Rocksteady is meant to ease the process of switching out different versions of inter-dependent code, providing you with a simple _scenario_ metaphor to write build and test code within.  It's test framework agnostic (just depending on exit codes), and extremely flexible.  We'll work through a simple example below.
 
 == Installation
 
