@@ -1,17 +1,13 @@
-class RockSteady
+module Rocksteady
   
   module Helpers
-    
-    def rocksteady
-      @rocksteady ||= RockSteady.new
+          
+    def corpus
+      @corpus ||= Rocksteady::Corpus.new(self)
     end
 
-    def set_repos(*paths)
-      rocksteady.add_repos(*paths.flatten)
-    end
-
-    def repo(repo_name)
-      rocksteady.repos[repo_name.to_s]
+    def repos(*paths)
+      corpus.add_repos(*paths.flatten)
     end
 
     def scenario(opts, &block)
@@ -20,25 +16,23 @@ class RockSteady
       else
         [opts, []]
       end
-      rocksteady.scenarios << __create_scenario(title, deps, &block)
+      scenario = corpus.add_scenario(title, &block)
+      generate_scenario_task scenario, deps
     end
     
     #######
     private
     #######
 
-    def __create_scenario(title, deps, &block)
-      name = title.gsub(/[^[:alnum:]]+/, '_').downcase
-      task_name = "rocksteady:scenario:#{name}"
-      task "#{task_name}:prepare" => 'rocksteady:run' do
-        @scenario_dir = File.expand_path("build/#{@timestamp}/scenarios/#{name}")
-        rm_rf @scenario_dir rescue nil
-        mkdir_p @scenario_dir
+    # Create the scenario task
+    def generate_scenario_task(scenario, deps)
+      deps.unshift 'rocksteady:refs:check'
+      desc scenario.title
+      task "rocksteady:scenario:#{corpus.scenarios.size}" => deps do |t|
+        scenario.schedule!
       end
-      desc %(Run scenario: "#{title}")
-      task(task_name => deps.unshift("#{task_name}:prepare", "rocksteady:scenario_chdir"), &block)
-      name
     end
-    
+      
   end
+    
 end

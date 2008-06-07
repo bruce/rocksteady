@@ -1,4 +1,5 @@
-$:.unshift(File.dirname(__FILE__))
-require 'rocksteady/core'
-require 'rocksteady/helpers'
-require 'rocksteady/tasks'
+Dir[File.dirname(__FILE__) << "/rocksteady/**/*.rb"].each do |file|
+  require file
+end
+
+include Rocksteady::Helpers

@@ -1,0 +1,131 @@
+= Rocksteady
+
+This rake-based library lets you run defined scenarios across multiple git repositories at arbitrary HEADs.  It's meant primarily as an easy way to test compatibility.
+
+== Author
+
+Bruce Williams (http://codefluency.com)
+http://github.com/bruce
+
+Please let me know if you're using Rocksteady; I enjoy hearing how my software is being used.
+
+== Premise
+
+Often you need to test bits of code you write with bits of code other people write, across varying revisions.  This is tedious, requiring a lot of custom code and infrastructure, so you probably don't do it enough.  I know I don't, and it's a bad habit.
+
+Rocksteady is meant to ease the process of switching out different versions of inter-dependent code, providing you with a simple _scenario_ metaphor to write build and test code within.  It's test framework agnostic (just depending on exit codes), and extremely flexible.  We'll work through a simple example below.
+
+== Defining Scenarios
+
+Create a new directory, and toss a +Rakefile+ in it.  Make it look like this:
+
+  require 'rubygems'
+  require 'rocksteady'
+  
+Now, point it at the git repos that are holding the code you'd like to test.  You could +clone+ the repos somewhere in this directory, if you'd like.  For this example, we'll be testing a Rails plugin we've written against various versions of Rails, so it like look something like this (assuming we cloned bare +.git+ repos into the current directory)
+
+  repos 'rails.git', 'our_plugin.git'
+  
+Okay, now let just create a single scenario.  In general, a scenario will be some set of configuration you'd like to test.  For this example we won't be doing anything fancy (just a simple drop in +vendor/plugins+) so it might look like this:
+
+  scenario "Installed in vendor/plugins" do
+    generate_rails_app
+    install_plugin
+    verify_loads_environment
+  end
+  
+You see 3 things need to happen in the scenario; we've broken these out for clarity and just define them underneath:
+
+First, let's generate a fresh Rails app for testing with:
+
+  def generate_rails_app
+    ruby "#{rails_path}/railties/bin/rails rails_app"
+  end
+  
+A few notes on what you see above:
+
+# +ruby+ is simply a +rake+ convenience method that calls out to a new +ruby+ interpreter
+# +rails_path+ is the absolute path to a fresh clone of the +rails.git+ repo we defined at the beginning of the file, checked-out to the reference point we're currently checking (more on how that's set later).  +*_path+ convenience methods are generated for all the repos you've defined; you'll see the other one in +install_plugin+.
+# We're calling out to the +rails+ executable in the checked-out source directly so we can generate an accurate skeleton app for that version.  The +rails_app+ argument is just the name of the directory where it will be generated.
+
+It's worth noting that when scenarios are being run, the current working directory is changed for you automatically; right now you're actually sitting in +build/<timestamp>/scenarios/installed_in_vendor_plugins+, where +rails_app+ will be generated as a subdirectory.
+
+Let's install the plugin now:
+
+  def install_plugin
+    cp_r our_plugin_path, 'rails_app/vendor/plugins'
+  end
+  
+# +cp_r+ is another +rake+ convenience method that does a recursive copy.
+# +our_plugin_path+ is the +*_path+ method generated automatically for our plugin repo.
+
+So, that was simple; for this quick example we just copy the plugin directly in.
+
+Now let's do something that just verifies the Rails app code will load successfully across the standard environments, just by printing the Rails version from +script/runner+:
+
+  def verify_loads_environment
+    Dir.chdir 'rails_app' do
+      %w(test development production).each do |env|
+        ENV['RAILS_ENV'] = env
+        ruby "script/runner 'p Rails::VERSION'"
+      end
+    end
+  end
+  
+The great thing about the convenience methods that +rake+ provides (eg, +ruby+, +sh+, +cp_r+, etc) is that the raise an exception if the system call they make returns a bad exit code; the scenario automatically catches them and assigns a _failure_ to the scenario.  If you're not using these convenience methods and need to assign a failure, you can raise an exception manually to get the same result.
+
+== Running against arbitrary references
+
+Here are some examples on how we could run the scenario, with plain English explanations:
+
+Run all scenarios, with all repos set to +master+:
+
+  $ rake rocksteady
+  
+Run just the first scenario (you can use +rake -T+ to see them all), with all repos set to +master+:
+
+  $ rake rocksteady:scenario:1
+  
+The same, but setting +rails+ to +v2.0.2+:
+
+  $ rake rocksteady:scenario:1 REFS=rails:v2.0.2
+  
+and now with +our_plugin+ set to the +experimental+ branch:
+
+  $ rake rocksteady:scenario:1 REFS=rails:v2.0.2,our_plugin:experimental
+  
+You can also use full references:
+
+$ rake rocksteady:scenario:1 REFS=rails:refs/tags/v2.0.2,our_plugin:refs/heads/experimental
+
+== Output
+
+Currently the output is a simple text-based table.  You'll need to refer to the output in the terminal to find _where_ your failures occur.  More granular, labelled scenario-level logging is on the roadmap.
+
+== License
+
+Copyright (c) 2008 Bruce R. Williams
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+  

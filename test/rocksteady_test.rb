@@ -3,20 +3,20 @@ require 'rubygems'
 require 'Shoulda'
 
 $:.unshift(File.dirname(__FILE__) << "/../lib")
-require 'rocksteady/core'
+require 'rocksteady/corpus'
 require 'rocksteady/helpers'
 
 class RSTarget
-  include RockSteady::Helpers
+  include Rocksteady::Helpers
 end
 
-class RockSteadyTest < Test::Unit::TestCase
+class RocksteadyTest < Test::Unit::TestCase
   
-  context "RockSteady" do
+  context "Rocksteady" do
     
     tmp_dir = File.dirname(__FILE__) << "/tmp"
 
-    repo_dirs = (1..10).to_a.map do |n|
+    repo_dirs = (1..3).to_a.map do |n|
       "#{tmp_dir}/repo#{n}"
     end
     
@@ -37,54 +37,54 @@ class RockSteadyTest < Test::Unit::TestCase
       FileUtils.rm_rf tmp_dir
     end
     
-    populate = lambda { @r.rocksteady.add_repos(*Dir["#{tmp_dir}/*"]) }
+    populate = lambda { @r.corpus.add_repos(*Dir["#{tmp_dir}/*"]) }
     
     context "Helpers" do
-      should "have rocksteady accessor added as a helper" do
-        assert @r.respond_to?(:rocksteady)
+      should "have corpus accessor added as a helper" do
+        assert @r.respond_to?(:corpus)
       end
     end
     
     context "Core" do
     
       should "start without repos" do
-        assert @r.rocksteady.repos.empty?    
+        assert @r.corpus.repos.empty?    
       end
 
       should "start without refs" do
-        assert @r.rocksteady.refs.empty?    
+        assert @r.corpus.refs.empty?    
       end
     
       should "add repos by paths" do
         instance_eval(&populate)
-        assert @r.rocksteady.repos.size == repo_dirs.size
-        assert @r.rocksteady.repos.keys.all? { |r| r =~ /^repo\d+$/ }
-        assert @r.rocksteady.repos.values.all? { |r| r.is_a?(Grit::Repo) }
-        assert @r.rocksteady.refs.empty?
+        assert @r.corpus.repos.size == repo_dirs.size
+        assert @r.corpus.repos.keys.all? { |r| r =~ /^repo\d+$/ }
+        assert @r.corpus.repos.values.all? { |r| r.is_a?(Grit::Repo) }
+        assert @r.corpus.refs.empty?
       end
     
       should "default refs for existing repos without explicit ref" do
         instance_eval(&populate)
-        assert @r.rocksteady.refs.empty?
-        @r.rocksteady.refs['repo1'] = explicit = 'explicit-ref-for-this-repo'
-        @r.rocksteady.default_refs!
-        masters, explicits = @r.rocksteady.refs.partition { |k, v| v == 'master' }
-        assert_equal 9, masters.size
+        assert @r.corpus.refs.empty?
+        @r.corpus.refs['repo1'] = explicit = 'explicit-ref-for-this-repo'
+        @r.corpus.default_refs!
+        masters, explicits = @r.corpus.refs.partition { |k, v| v == 'master' }
+        assert_equal 2, masters.size
         assert_equal 1, explicits.size
       end
     
       should "allow verification of refs" do
         instance_eval(&populate)
-        assert @r.rocksteady.refs.empty?
-        @r.rocksteady.default_refs!    
+        assert @r.corpus.refs.empty?
+        @r.corpus.default_refs!    
         assert_nothing_raised do
-          @r.rocksteady.verify_refs!
+          @r.corpus.verify_refs!
         end
-        @r.rocksteady.refs.clear    
-        @r.rocksteady.refs['repo1'] = 'this-does-not-exist'
-        @r.rocksteady.default_refs!
+        @r.corpus.refs.clear    
+        @r.corpus.refs['repo1'] = 'this-does-not-exist'
+        @r.corpus.default_refs!
         assert_raises ArgumentError do
-          @r.rocksteady.verify_refs!
+          @r.corpus.verify_refs!
         end
       end
     

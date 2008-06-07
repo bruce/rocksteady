@@ -8,26 +8,18 @@ namespace :rocksteady do
     rm_rf 'build' rescue nil
   end
   
-  task :run => 'rocksteady:refs:check' do
-    @timestamp = Time.now.to_i
-  end
-  
-  task :scenario_chdir do
-    Dir.chdir @scenario_dir
-  end
-  
   namespace :refs do
     
     task :check => :default do
       begin
-        rocksteady.verify_refs!
+        corpus.verify_refs!
       rescue ArgumentError => e
         abort e.message
       end
     end
     
     task :default => :add_from_env do
-      rocksteady.default_refs!
+      corpus.default_refs!
     end
     
     task :add_from_env => 'rocksteady:repos:check' do
@@ -36,8 +28,8 @@ namespace :rocksteady do
         pairs.each do |pair|
           repo_name, ref = pair.split(':')
           ref ||= 'master'
-          if (repo = rocksteady.repos[repo_name])
-            rocksteady.refs[repo_name] = ref
+          if (repo = corpus.repos[repo_name])
+            corpus.refs[repo_name] = ref
           end
         end
       end
@@ -49,13 +41,13 @@ namespace :rocksteady do
     
     desc "Show configured source repositories"
     task :show => :check do
-      rocksteady.repos.sort_by { |k, v| k }.each do |name, repo|
+      corpus.repos.sort_by { |k, v| k }.each do |name, repo|
         puts "#{name}: #{repo.path}"
       end
     end
     
     task :check => :add_from_env do
-      unless rocksteady.repos.any?
+      unless corpus.repos.any?
         abort "Could not find repositories.\nSet ENV['REPOS'] or use `repo' method in Rakefile to set repo paths."
       end
     end
@@ -63,7 +55,7 @@ namespace :rocksteady do
     task :add_from_env do
       if ENV['REPOS']
         paths = ENV['REPOS'].split(',')
-        rocksteady.add_repos(*paths)
+        corpus.add_repos(*paths)
       end
     end
 
@@ -71,12 +63,9 @@ namespace :rocksteady do
   
 end
 
-desc "Run all scenarios"
-task :rocksteady => 'rocksteady:run' do
-  rocksteady.scenarios.each do |name|
-    Rake::Task["rocksteady:scenario:#{name}"].invoke
+desc "Run all corpus scenarios"
+task :rocksteady => 'rocksteady:refs:check' do
+  corpus.scenarios.each do |scenario|
+    scenario.schedule!
   end
 end
-
-
-include RockSteady::Helpers
