@@ -20,14 +20,14 @@ namespace :rocksteady do
     
     task :check => :default do
       begin
-        @rocksteady.verify_refs!
+        rocksteady.verify_refs!
       rescue ArgumentError => e
         abort e.message
       end
     end
     
     task :default => :add_from_env do
-      @rocksteady.default_refs!
+      rocksteady.default_refs!
     end
     
     task :add_from_env => 'rocksteady:repos:check' do
@@ -36,8 +36,8 @@ namespace :rocksteady do
         pairs.each do |pair|
           repo_name, ref = pair.split(':')
           ref ||= 'master'
-          if (repo = @rocksteady.repos[repo_name])
-            @rocksteady.refs[repo_name] = ref
+          if (repo = rocksteady.repos[repo_name])
+            rocksteady.refs[repo_name] = ref
           end
         end
       end
@@ -49,13 +49,13 @@ namespace :rocksteady do
     
     desc "Show configured source repositories"
     task :show => :check do
-      @rocksteady.repos.sort_by { |k, v| k }.each do |name, repo|
+      rocksteady.repos.sort_by { |k, v| k }.each do |name, repo|
         puts "#{name}: #{repo.path}"
       end
     end
     
     task :check => :add_from_env do
-      unless @rocksteady.repos.any?
+      unless rocksteady.repos.any?
         abort "Could not find repositories.\nSet ENV['REPOS'] or use `repo' method in Rakefile to set repo paths."
       end
     end
@@ -63,7 +63,7 @@ namespace :rocksteady do
     task :add_from_env do
       if ENV['REPOS']
         paths = ENV['REPOS'].split(',')
-        @rocksteady.add_repos(*paths)
+        rocksteady.add_repos(*paths)
       end
     end
 
@@ -73,11 +73,10 @@ end
 
 desc "Run all scenarios"
 task :rocksteady => 'rocksteady:run' do
-  @rocksteady.scenario_tasks.each do |t|
-    Rake::Task[t].invoke
+  rocksteady.scenarios.each do |name|
+    Rake::Task["rocksteady:scenario:#{name}"].invoke
   end
 end
 
 
 include RockSteady::Helpers
-@rocksteady = RockSteady.new

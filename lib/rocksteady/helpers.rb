@@ -1,13 +1,17 @@
 class RockSteady
   
   module Helpers
+    
+    def rocksteady
+      @rocksteady ||= RockSteady.new
+    end
 
     def set_repos(*paths)
-      @rocksteady.add_repos(*paths.flatten)
+      rocksteady.add_repos(*paths.flatten)
     end
 
     def repo(repo_name)
-      @rocksteady.repos[repo_name.to_s]
+      rocksteady.repos[repo_name.to_s]
     end
 
     def scenario(opts, &block)
@@ -16,14 +20,14 @@ class RockSteady
       else
         [opts, []]
       end
-      @rocksteady.scenario_tasks << __scenario_task_for(title, deps, &block)
+      rocksteady.scenarios << __create_scenario(title, deps, &block)
     end
     
     #######
     private
     #######
 
-    def __scenario_task_for(title, deps, &block)
+    def __create_scenario(title, deps, &block)
       name = title.gsub(/[^[:alnum:]]+/, '_').downcase
       task_name = "rocksteady:scenario:#{name}"
       task "#{task_name}:prepare" => 'rocksteady:run' do
@@ -33,7 +37,7 @@ class RockSteady
       end
       desc %(Run scenario: "#{title}")
       task(task_name => deps.unshift("#{task_name}:prepare", "rocksteady:scenario_chdir"), &block)
-      task_name
+      name
     end
     
   end
