@@ -96,7 +96,7 @@ and now with <tt>our_plugin</tt> set to the <tt>experimental</tt> branch:
   
 You can also use full references:
 
-$ rake rocksteady:scenario:1 REFS=rails:refs/tags/v2.0.2,our_plugin:refs/heads/experimental
+  $ rake rocksteady:scenario:1 REFS=rails:refs/tags/v2.0.2,our_plugin:refs/heads/experimental
 
 == Output
 
