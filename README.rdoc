@@ -2,12 +2,15 @@
 
 Often you need to test bits of code you write with bits of code other people write, across varying revisions.  This is tedious, requiring a lot of custom work and infrastructure, so you probably don't do it enough.  I know I don't, and it's a bad habit.
 
-Rocksteady is meant to ease the process of switching out different versions of inter-dependent code, providing you with a simple _scenario_ metaphor to write build and test code within.  It's test framework agnostic (it just uses exit codes), and extremely flexible.  <i>Below you can read an example of testing different versions of Rails against different versions of a plugin</i>.
+Rocksteady is meant to ease the process of switching out different versions of inter-dependent code, providing you with a simple _scenario_ metaphor to write build and test code within.  It's test framework agnostic (it just uses exit codes), and extremely flexible.  
+
+Below you can read an example of testing different versions of Rails against different versions of a plugin; more in-depth examples can be found on the wiki (http://github.com/bruce/rocksteady/wikis/examples).
+
+<i>Please let me know how you're using Rocksteady; it's nice to have feedback</i>.
 
 Bruce Williams (http://codefluency.com)
 http://github.com/bruce
 
-<i>Please let me know how you're using Rocksteady; it's nice to have feedback</i>.
 
 == Installation
 
