@@ -17,16 +17,16 @@ Rocksteady is meant to ease the process of switching out different versions of i
 
 == Defining Scenarios
 
-Create a new directory, and toss a @Rakefile@ in it.  Make it look like this:
+Create a new directory, and toss a <tt>Rakefile</tt> in it.  Make it look like this:
 
   require 'rubygems'
   require 'rocksteady'
   
-Now, point it at the git repos that are holding the code you'd like to test.  You could @clone@ the repos somewhere in this directory, if you'd like.  For this example, we'll be testing a Rails plugin we've written against various versions of Rails, so it like look something like this (assuming we cloned bare @.git@ repos into the current directory)
+Now, point it at the git repos that are holding the code you'd like to test.  You could <tt>clone</tt> the repos somewhere in this directory, if you'd like.  For this example, we'll be testing a Rails plugin we've written against various versions of Rails, so it like look something like this (assuming we cloned bare <tt>.git</tt> repos into the current directory)
 
   repos 'rails.git', 'our_plugin.git'
   
-Okay, now let just create a single scenario.  In general, a scenario will be some set of configuration you'd like to test.  For this example we won't be doing anything fancy (just a simple drop in @vendor/plugins@) so it might look like this:
+Okay, now let just create a single scenario.  In general, a scenario will be some set of configuration you'd like to test.  For this example we won't be doing anything fancy (just a simple drop in <tt>vendor/plugins</tt>) so it might look like this:
 
   scenario "Installed in vendor/plugins" do
     generate_rails_app
@@ -44,11 +44,11 @@ First, let's generate a fresh Rails app for testing with:
   
 A few notes on what you see above:
 
-0. @ruby@ is simply a @rake@ convenience method that calls out to a new @ruby@ interpreter
-0. @rails_path@ is the absolute path to a fresh clone of the @rails.git@ repo we defined at the beginning of the file, checked-out to the reference point we're currently checking (more on how that's set later).  @*_path@ convenience methods are generated for all the repos you've defined; you'll see the other one in @install_plugin@.
-0. We're calling out to the @rails@ executable in the checked-out source directly so we can generate an accurate skeleton app for that version.  The @rails_app@ argument is just the name of the directory where it will be generated.
+0. <tt>ruby</tt> is simply a <tt>rake</tt> convenience method that calls out to a new <tt>ruby</tt> interpreter
+0. <tt>rails_path</tt> is the absolute path to a fresh clone of the <tt>rails.git</tt> repo we defined at the beginning of the file, checked-out to the reference point we're currently checking (more on how that's set later).  <tt>*_path</tt> convenience methods are generated for all the repos you've defined; you'll see the other one in <tt>install_plugin</tt>.
+0. We're calling out to the <tt>rails</tt> executable in the checked-out source directly so we can generate an accurate skeleton app for that version.  The <tt>rails_app</tt> argument is just the name of the directory where it will be generated.
 
-It's worth noting that when scenarios are being run, the current working directory is changed for you automatically; right now you're actually sitting in @build/<timestamp>/scenarios/installed_in_vendor_plugins@, where @rails_app@ will be generated as a subdirectory.
+It's worth noting that when scenarios are being run, the current working directory is changed for you automatically; right now you're actually sitting in <tt>build/<timestamp>/scenarios/installed_in_vendor_plugins</tt>, where <tt>rails_app</tt> will be generated as a subdirectory.
 
 Let's install the plugin now:
 
@@ -56,12 +56,12 @@ Let's install the plugin now:
     cp_r our_plugin_path, 'rails_app/vendor/plugins'
   end
   
-0. @cp_r@ is another @rake@ convenience method that does a recursive copy.
-0. @our_plugin_path@ is the @*_path@ method generated automatically for our plugin repo.
+0. <tt>cp_r</tt> is another <tt>rake</tt> convenience method that does a recursive copy.
+0. <tt>our_plugin_path</tt> is the <tt>*_path</tt> method generated automatically for our plugin repo.
 
 So, that was simple; for this quick example we just copy the plugin directly in.
 
-Now let's do something that just verifies the Rails app code will load successfully across the standard environments, just by printing the Rails version from @script/runner@:
+Now let's do something that just verifies the Rails app code will load successfully across the standard environments, just by printing the Rails version from <tt>script/runner</tt>:
 
   def verify_loads_environment
     Dir.chdir 'rails_app' do
@@ -72,25 +72,25 @@ Now let's do something that just verifies the Rails app code will load successfu
     end
   end
   
-The great thing about the convenience methods that @rake@ provides (eg, @ruby@, @sh@, @cp_r@, etc) is that the raise an exception if the system call they make returns a bad exit code; the scenario automatically catches them and assigns a _failure_ to the scenario.  If you're not using these convenience methods and need to assign a failure, you can raise an exception manually to get the same result.
+The great thing about the convenience methods that <tt>rake</tt> provides (eg, <tt>ruby</tt>, <tt>sh</tt>, <tt>cp_r</tt>, etc) is that the raise an exception if the system call they make returns a bad exit code; the scenario automatically catches them and assigns a _failure_ to the scenario.  If you're not using these convenience methods and need to assign a failure, you can raise an exception manually to get the same result.
 
 == Running against arbitrary references
 
 Here are some examples on how we could run the scenario, with plain English explanations:
 
-Run all scenarios, with all repos set to @master@:
+Run all scenarios, with all repos set to <tt>master</tt>:
 
   $ rake rocksteady
   
-Run just the first scenario (you can use @rake -T@ to see them all), with all repos set to @master@:
+Run just the first scenario (you can use @rake -T@ to see them all), with all repos set to <tt>master</tt>:
 
   $ rake rocksteady:scenario:1
   
-The same, but setting @rails@ to @v2.0.2@:
+The same, but setting <tt>rails</tt> to <tt>v2.0.2</tt>:
 
   $ rake rocksteady:scenario:1 REFS=rails:v2.0.2
   
-and now with @our_plugin@ set to the @experimental@ branch:
+and now with <tt>our_plugin</tt> set to the <tt>experimental</tt> branch:
 
   $ rake rocksteady:scenario:1 REFS=rails:v2.0.2,our_plugin:experimental
   
