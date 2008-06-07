@@ -15,6 +15,21 @@ Often you need to test bits of code you write with bits of code other people wri
 
 Rocksteady is meant to ease the process of switching out different versions of inter-dependent code, providing you with a simple _scenario_ metaphor to write build and test code within.  It's test framework agnostic (just depending on exit codes), and extremely flexible.  We'll work through a simple example below.
 
+== Installation
+
+Get it from RubyForge (once released):
+  sudo gem install rocksteady
+
+=== Dependencies
+
+* rake
+   sudo gem install rake
+* ruport
+   sudo gem install ruport
+* mojombo-grit >= 0.8.0
+   sudo gem install mojombo-grit -s http://gems.github.com
+* (git in your PATH)
+    
 == Defining Scenarios
 
 Create a new directory, and toss a <tt>Rakefile</tt> in it.  Make it look like this:
