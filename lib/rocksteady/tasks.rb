@@ -48,7 +48,7 @@ namespace :rocksteady do
     
     task :check => :add_from_env do
       unless corpus.repos.any?
-        abort "Could not find repositories.\nSet ENV['REPOS'] or use `repo' method in Rakefile to set repo paths."
+        abort "Could not find repositories.\nSet ENV['REPOS'] or use `repos' method in Rakefile to set repo paths."
       end
     end
     
