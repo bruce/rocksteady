@@ -52,13 +52,14 @@ First, let's generate a fresh Rails app for testing with:
 
   def generate_rails_app
     ruby "#{rails_path}/railties/bin/rails rails_app"
+    cp_r rails_path, 'rails_app/vendor/rails'
   end
   
 A few notes on what you see above:
 
 0. <tt>ruby</tt> is simply a <tt>rake</tt> convenience method that calls out to a new <tt>ruby</tt> interpreter
 0. <tt>rails_path</tt> is the absolute path to a fresh clone of the <tt>rails.git</tt> repo we defined at the beginning of the file, checked-out to the reference point we're currently checking (more on how that's set later).  <tt>*_path</tt> convenience methods are generated for all the repos you've defined; you'll see the other one in <tt>install_plugin</tt>.
-0. We're calling out to the <tt>rails</tt> executable in the checked-out source directly so we can generate an accurate skeleton app for that version.  The <tt>rails_app</tt> argument is just the name of the directory where it will be generated.
+0. First we're calling out to the <tt>rails</tt> executable in the checked-out source directly so we can generate an accurate skeleton app for that version.  The <tt>rails_app</tt> argument is just the name of the directory where it will be generated.  Finally, we're copying Rails into <tt>vendor/rails</tt> so this copy overrides any gems installed on our system.
 
 It's worth noting that when scenarios are being run, the current working directory is changed for you automatically; right now you're actually sitting in <tt>build/<timestamp>/scenarios/installed_in_vendor_plugins</tt>, where <tt>rails_app</tt> will be generated as a subdirectory.
 
