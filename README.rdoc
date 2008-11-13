@@ -34,7 +34,7 @@ Create a new directory, and toss a <tt>Rakefile</tt> in it.  Make it look like t
   require 'rubygems'
   require 'rocksteady'
   
-Now, point it at the git repos that are holding the code you'd like to test.  You could <tt>clone</tt> the repos somewhere in this directory, if you'd like.  For this example, we'll be testing a Rails plugin we've written against various versions of Rails, so it like look something like this (assuming we cloned bare <tt>.git</tt> repos into the current directory)
+Now, point it at the (bare) git repos that are holding the code you'd like to test.  You could <tt>clone</tt> the repos somewhere in this directory, if you'd like.  For this example, we'll be testing a Rails plugin we've written against various versions of Rails, so it like look something like this (assuming we cloned bare <tt>.git</tt> repos into the current directory)
 
   repos 'rails.git', 'our_plugin.git'
   
@@ -46,7 +46,7 @@ Okay, now let just create a single scenario.  In general, a scenario will be som
     verify_loads_environment
   end
   
-You see 3 things need to happen in the scenario; we've broken these out for clarity and just define them underneath:
+You see 3 things need to happen in the scenario; we've broken these out for clarity and just define them underneath.
 
 First, let's generate a fresh Rails app for testing with:
 
@@ -86,6 +86,8 @@ Now let's do something that just verifies the Rails app code will load successfu
   end
   
 The great thing about the convenience methods that <tt>rake</tt> provides (eg, <tt>ruby</tt>, <tt>sh</tt>, <tt>cp_r</tt>, etc) is that the raise an exception if the system call they make returns a bad exit code; the scenario automatically catches them and assigns a _failure_ to the scenario.  If you're not using these convenience methods and need to assign a failure, you can raise an exception manually to get the same result.
+
+Note that your scenario should return a true-ish value or else it will get run multiple times. (This is because the result of the scenario is memoized for later reference.) Rocksteady judges the success of a scenario based on whether it runs to completion or not. If you want your scenario to fail, just raise an exception or let one bubble out of steps inside your scenario.
 
 == Running against arbitrary references
 
