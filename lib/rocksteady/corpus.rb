@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'mojombo-grit'
+require 'grit'
 
 module Rocksteady
   
@@ -54,6 +54,11 @@ module Rocksteady
           raise ArgumentError, "Could not find #{repo_name} ref `#{ref}'"
         end
       end
+    rescue Grit::Git::GitTimeout => e
+      puts 'Grit error'
+      puts "  Command: #{e.command}"
+      puts "  Bytes: #{e.bytes_read}"
+      raise e
     end
   
     def session
