@@ -35,6 +35,16 @@ module Rocksteady
       end
     end
     
+    # REMOTE REPOS
+    
+    def remote_repos
+      @remote_repos ||= {}
+    end
+    
+    def add_remote_repo(name, url)
+      remote_repos[name] = url
+    end
+    
     # REFS
     
     def refs

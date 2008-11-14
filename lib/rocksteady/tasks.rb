@@ -46,6 +46,23 @@ namespace :rocksteady do
       end
     end
     
+    desc "Fetch remote repositories"
+    task :fetch do
+      corpus.remote_repos.each do |name, url|
+        # Move to corpus?
+        path = name.to_s
+        if File.directory?(path)
+          puts "#{path} already cloned, pulling"
+          Dir.chdir(path) do
+            sh "git pull"
+          end
+        else
+          puts "#{path} does not exist, cloning"
+          sh "git clone #{url} #{path}" 
+        end
+      end
+    end
+    
     task :check => :add_from_env do
       unless corpus.repos.any?
         abort "Could not find repositories.\nSet ENV['REPOS'] or use `repos' method in Rakefile to set repo paths."

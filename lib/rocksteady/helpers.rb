@@ -9,6 +9,12 @@ module Rocksteady
     def repos(*paths)
       corpus.add_repos(*paths.flatten)
     end
+    
+    def remote_repos(repos)
+      repos.each do |name, url|
+        corpus.add_remote_repo(name, url)
+      end
+    end
 
     def scenario(opts, &block)
       title, deps = if opts.is_a?(Hash)
