@@ -48,18 +48,22 @@ namespace :rocksteady do
     
     desc "Fetch remote repositories"
     task :fetch do
+      root = File.join('build', 'clones')
+      mkdir_p root
       corpus.remote_repos.each do |name, url|
         # Move to corpus?
-        path = name.to_s
+        path = File.join(root, name.to_s)
         if File.directory?(path)
           puts "#{path} already cloned, pulling"
           Dir.chdir(path) do
-            sh "git pull"
+            sh "git fetch"
           end
         else
           puts "#{path} does not exist, cloning"
           sh "git clone #{url} #{path}" 
         end
+        
+        corpus.add_repos(path)
       end
     end
     
@@ -81,7 +85,7 @@ namespace :rocksteady do
 end
 
 desc "Run all corpus scenarios"
-task :rocksteady => 'rocksteady:refs:check' do
+task :rocksteady => ['rocksteady:repos:fetch', 'rocksteady:refs:check'] do
   corpus.scenarios.each do |scenario|
     scenario.schedule!
   end
