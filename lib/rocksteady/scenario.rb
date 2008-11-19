@@ -21,6 +21,8 @@ module Rocksteady
       @result ||= begin
         operation.call
       rescue Exception => e
+        puts e.inspect
+        puts '  ' + e.backtrace.join("\n  ")
         e
       end
     end
