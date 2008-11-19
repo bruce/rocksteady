@@ -11,5 +11,7 @@ at_exit do
       end
     end
     puts table
+    puts "Skipped scenarios: "
+    corpus.skipped_scenarios.each { |name| puts "* #{name}" }
   end
 end

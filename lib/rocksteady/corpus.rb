@@ -22,6 +22,16 @@ module Rocksteady
       scenario
     end
     
+    # SKIPPED SCENARIOS
+    
+    def skipped_scenarios
+      @skipped_scenarios ||= []
+    end
+    
+    def add_skipped_scenario(name)
+      skipped_scenarios << name
+    end
+    
     # REPOS
   
     def repos

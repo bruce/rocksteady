@@ -26,6 +26,10 @@ module Rocksteady
       generate_scenario_task scenario, deps
     end
     
+    def skip_scenario(name, *args)
+      corpus.add_skipped_scenario(name)
+    end
+    
     #######
     private
     #######
