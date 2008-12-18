@@ -1,4 +1,5 @@
 require 'rubygems'
+gem 'mojombo-grit'
 require 'grit'
 
 module Rocksteady
